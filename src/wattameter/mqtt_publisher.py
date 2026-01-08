@@ -12,6 +12,8 @@ import logging
 import time
 from typing import Optional, Dict, Any
 from datetime import datetime
+import platform
+import socket
 
 # MQTT client is an optional dependency
 try:
@@ -22,6 +24,37 @@ except ImportError:
     MQTT_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
+
+def get_node_name() -> str:
+    """
+    Get the node name of the current machine.
+    
+    Attempts to retrieve the node name using platform.node() first,
+    then falls back to socket.gethostname() if that fails.
+    
+    Returns:
+        str: The node name of the machine (or unknown)
+    """
+    node_name: Optional[str] = None
+    
+    # Try platform.node() first
+    try:
+        node_name = platform.node()
+        if node_name and node_name.strip():
+            return node_name.strip()
+    except Exception as e:
+        print(f"Warning: platform.node() failed: {e}")
+    
+    # Fall back to socket.gethostname()
+    try:
+        node_name = socket.gethostname()
+        if node_name and node_name.strip():
+            return node_name.strip()
+    except Exception as e:
+        print(f"Warning: socket.gethostname() failed: {e}")
+    
+    # If both methods failed
+    return 'unknown'
 
 
 class MQTTPublisher:
@@ -72,6 +105,7 @@ class MQTTPublisher:
         self.topic_prefix = topic_prefix.rstrip("/")  # Remove trailing slash
         self.qos = qos
         self.keepalive = keepalive
+        self.node_name = get_node_name()
         
         # Generate a client ID if not provided
         if client_id is None:
@@ -224,6 +258,7 @@ class MQTTPublisher:
             "timestamp[ns]": timestamp_ns,
             "timestamp[iso]": datetime.fromtimestamp(timestamp_ns / 1e9).isoformat(),
             "reading-time[ns]": reading_time_ns,
+            "node": self.node_name,
         }
         
         # Add main measurements
