@@ -301,6 +301,7 @@ class Tracker(BaseTracker):
             password = self.mqtt_config.get("password")
             topic_prefix = self.mqtt_config.get("topic_prefix", "wattameter")
             qos = self.mqtt_config.get("qos", 1)
+            run_id = self.mqtt_config.get("run_id")
             
             # Create the publisher instance
             self.mqtt_publisher = MQTTPublisher(
@@ -310,6 +311,7 @@ class Tracker(BaseTracker):
                 password=password,
                 topic_prefix=topic_prefix,
                 qos=qos,
+                run_id=run_id,
             )
             
             # Attempt to connect

@@ -79,6 +79,7 @@ class MQTTPublisher:
     :param client_id: MQTT client identifier (default: auto-generated)
     :param qos: Quality of Service level (0, 1, or 2; default: 1)
     :param keepalive: Keepalive interval in seconds (default: 60)
+    :param run_id: Optional experiment/run identifier to include in messages
     """
     
     def __init__(
@@ -91,6 +92,7 @@ class MQTTPublisher:
         client_id: Optional[str] = None,
         qos: int = 1,
         keepalive: int = 60,
+        run_id: Optional[str] = None,
     ):
         """Initialize the MQTT publisher with connection parameters."""
         if not MQTT_AVAILABLE:
@@ -106,6 +108,7 @@ class MQTTPublisher:
         self.qos = qos
         self.keepalive = keepalive
         self.node_name = get_node_name()
+        self.run_id = run_id
         
         # Generate a client ID if not provided
         if client_id is None:
@@ -259,6 +262,7 @@ class MQTTPublisher:
             "timestamp[iso]": datetime.fromtimestamp(timestamp_ns / 1e9).isoformat(),
             "reading-time[ns]": reading_time_ns,
             "node": self.node_name,
+            "run_id": self.run_id,
         }
         
         # Add main measurements

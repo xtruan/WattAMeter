@@ -36,6 +36,7 @@ def main(timestamp_fmt="%Y-%m-%d_%H:%M:%S.%f"):
             "password": args.mqtt_password,
             "topic_prefix": args.mqtt_topic_prefix,
             "qos": args.mqtt_qos,
+            "run_id": args.id,
         }
         logging.info(
             f"MQTT publishing enabled to {args.mqtt_broker}:{args.mqtt_port} "
